@@ -28,7 +28,7 @@ class NMTModel:
 		translation = self.model.generate(**encode_src)
 
 		#Decode: convert to regular string
-		decode_target = [self.tokenizer.decode(t) for t in translation]
+		decode_target = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translation]
 		return decode_target
 
 
