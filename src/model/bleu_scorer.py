@@ -1,36 +1,28 @@
+from sacrebleu.metrics import BLEU
+import plotly.graph_objects as go
+import numpy as np
+
 """
-Testing the MarianMT English-German NMT Model
-Generate BLEU scores.
-
-Naive BLEU (Bi-Lingual Evaluation Understudy)
-Compares the NMT's translation (candidate) with
-a group of existing translations written by humans (reference).
-
-Computes precision (proportion of tokens in candidate 
-that appear in references)
-
-Penalises words that appear in the candidate more times 
-than they do in any of the references. Only counts the number
-of words in the references and doesn't count the others.
-
-Range: Between zero, the worst, and one, the best.
-
-BLEU = Words Covered in Ref / Total Words in Candidate
-
-However, this BLEU score is not the actual one used in practice.
-We must look to an derivative for a more effective score.
-
-Two problems with this BLEU score is that it does not take into
-account word order, and additionally applies a better score to
-smaller translations that contain words present in the reference,
-regardless of how many words should truly be in it.
-
+--WOVEN NMT Model BLEU Scorer--
+Desc: Calculates the BLEU scores for the WOVEN NMT model using
+the WMT20 English to German reference set.
 For our tests, we will use sacreBLEU, which provides "hassle-free
 computation of shareable, comparable, and reproducible BLEU scores."
+
+The precision of an n-gram (ie a group of tokens) is interpreted as
+the words covered by our candidate in the reference sets divided by
+the total number of words in the candidate. In summary:
+Precision = Words Covered in Ref / Total Words in Candidate
+A brevity penalty is applied to penalise candidate translations which
+deviate from the length of any their respective references references.
+
+Results: The model achieves a BLEU score of 31.
+This can be interpreted as "understandable to good translations".
+Note that more reference sets per translation would likely improve
+this further.
+
+Please refer to the BLEU Score report for further details.
 """
-from sacrebleu.metrics import BLEU
-from nmt import NMTModel
-import numpy as np
 
 class BLEUScorer(BLEU):
 	def __init__(self, candidates: list[str], references: list[list[str]]):
@@ -39,6 +31,9 @@ class BLEUScorer(BLEU):
 		self.r = references
 		self.num_samples = len(candidates)
 		self.scr = self.corpus_score(candidates, references)
+
+	def get_precisions(self):
+		return self.scr.precisions
 
 	def print_results(self):
 		bleu_info = self.scr
@@ -61,11 +56,6 @@ class BLEUScorer(BLEU):
 		print("\nBLEU Score: {:.2f}".format(bleu_info.score))
 		print("----------------")
 
-def write(translations: list[str], path: str):
-	with open(path, 'w', encoding='utf-8') as w:
-		for t in translations:
-			w.write(t + "\n")
-
 def read(path: str, with_strip=False):
 	with open(path, 'r', encoding='utf-8') as r:
 		if with_strip:
@@ -78,18 +68,6 @@ def main():
 	path_to_candidates = 'data/wmt20_cand_set.txt'
 	path_to_references = 'data/wmt20_ref_set.txt'
 
-	samples_per_batch = 50
-
-	#Translate
-	source = read(path_to_source, with_strip=True)
-
-	model = NMTModel('en','de')
-	candidates = model.translate_in_batches(source, \
-		samples_per_batch=samples_per_batch)
-
-	#Save
-	write(candidates, path_to_candidates)
-
 	#References must be wrapped as there can be multiple
 	#references (2D) for each candidate (1D)
 	references = [read(path_to_references)]
@@ -98,6 +76,21 @@ def main():
 	#Compute BLEU Score
 	scorer = BLEUScorer(candidates, references)
 	scorer.print_results()
+
+	#Plot the N-Gram Results
+	grams = ["1-Gram", "2-Gram", "3-Gram", "4-Gram"]
+	precisions = scorer.get_precisions()
+
+	fig = go.Figure([go.Bar(x=grams, y=precisions)])
+	fig.update_layout(title_text="BLEU N-Gram Precision Scores",
+		autosize=False,
+	    width=500,
+	    height=500,)
+	fig.update_xaxes(title="N-Gram")
+	fig.update_yaxes(title="Precision (%)")
+	fig.update_traces(marker_color='rgb(158,202,225)', marker_line_color='rgb(8,48,107)',
+                  marker_line_width=1.5, opacity=0.6)
+	fig.show()
 
 if __name__ == "__main__":
 	main()
