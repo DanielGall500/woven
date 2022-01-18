@@ -60,4 +60,10 @@ class NMTModel:
 		fullbatch = np.reshape(fullbatch, (-1,)).tolist()
 		return fullbatch
 
+	def get(self):
+		return self.model
+
+	def get_tokenizer(self):
+		return self.tokenizer
+
 
