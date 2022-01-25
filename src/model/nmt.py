@@ -8,8 +8,9 @@ used and deployed in python.
 """
 from transformers import MarianMTModel, MarianTokenizer
 import numpy as np
+from typing import List
 
-def split_into_batches(samples: list[str], samples_per_batch=25):
+def split_into_batches(samples: List[str], samples_per_batch=25):
 	n = len(samples)
 	leftover = len(samples) % samples_per_batch
 	samples = samples[:n-leftover]
@@ -38,7 +39,7 @@ class NMTModel:
 		decode_target = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translation]
 		return decode_target
 
-	def translate_in_batches(self, src: list[str], samples_per_batch=25):
+	def translate_in_batches(self, src: List[str], samples_per_batch=25):
 		minibatches = split_into_batches(src, samples_per_batch)
 		num_batches = len(minibatches)
 		fullbatch = []
