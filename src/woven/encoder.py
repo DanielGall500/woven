@@ -10,7 +10,7 @@ the resulting Shapley values in a WOVEncodable object.
 """
 
 class WOVEncoder:
-    explainer_file_path = "shap/partition_explainer.pickle"
+    explainer_file_path = "explainer/partition_explainer.pickle"
 
     def __init__(self):
         #Load the Pre-trained SHAP Partition Explainer
