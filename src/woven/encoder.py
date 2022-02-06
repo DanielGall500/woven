@@ -51,8 +51,11 @@ def main():
     cv = encoded.get_confidence_scores()
     print("--Confidence Valyes--")
     print(cv)
-    print("Rows (dey): ", encoded.t_inp)
-    print("Cols (eng): ", encoded.t_out)
+    print("Rows (eng): ", encoded.t_inp)
+    print("Cols (deu): ", encoded.t_out)
+    wov = encoded.get_wov_encoding()
+    print("--WOV Encoding--")
+    print(wov)
 
 if __name__ == "__main__":
     main()
