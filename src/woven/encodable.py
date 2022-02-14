@@ -45,9 +45,6 @@ class WOVEncodable:
         I_size = len(self.raw)
         O_size = len(self.raw[0])
 
-        print("--Raw--")
-        print(self.raw)
-        print("----")
         confidence_scores = []
 
         for o_indx in range(O_size):
@@ -77,19 +74,26 @@ class WOVEncodable:
                     #to other o's?
                     i_adjusted = i - avg
                 else:
-                    i_adjusted = 0
+                    #Ensure negative Shapley values
+                    #have min confidence by assigning
+                    #nan and giving min after
+                    i_adjusted = np.nan
                 shap_Io_adjusted.append(i_adjusted)
 
             confidence_scores.append(shap_Io_adjusted)
 
-        #MinMax Normalisation
-        #Find the min
+        #Set irrelevant Shapley values from above
+        #equal to minimum adjusted value
+        #This gives them a confidence of 0
         confidence_scores = np.array(confidence_scores)
-        min_score = np.amin(confidence_scores)
+        min_score = np.nanmin(confidence_scores)
+        confidence_scores = np.nan_to_num(confidence_scores, nan=min_score-1) 
 
-        #Add the min onto it
+        #MinMax Normalisation
+        #Add the min onto all scores to bring them 0 or above
+        #NaNs (ie irrelevant Shapley vals) will be equal to -1.
         confidence_scores = np.add(confidence_scores, abs(min_score))
-
+        
         #Find the new max
         max_score = np.amax(confidence_scores)
 
@@ -98,6 +102,9 @@ class WOVEncodable:
 
         #Multiply for simplicity to create range (0,100)
         confidence_scores = np.multiply(confidence_scores,100)
+
+        #Set all irrelevant Shapley values to -1
+        confidence_scores[confidence_scores < 0] = -1
 
         #Round the scores
         confidence_scores = np.around(confidence_scores, 2)
