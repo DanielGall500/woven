@@ -40,22 +40,5 @@ class WOVEncoder:
     def _is_valid_input(self, E):
         return True
 
-def main():
-    encoder = WOVEncoder()
-    example_str = "I hope that it is good thanks"
-    encoded = encoder.encode([example_str])
-    first_word_input = encoded.t_inp[1]
-    first_word_output = encoded.t_out[2]
-    print("SHAP Values")
-    print(np.around(encoded.raw,2))
-    cv = encoded.get_confidence_scores()
-    print("--Confidence Valyes--")
-    print(cv)
-    print("Rows (eng): ", encoded.t_inp)
-    print("Cols (deu): ", encoded.t_out)
-    wov = encoded.get_wov_encoding()
-    print("--WOV Encoding--")
-    print(wov)
-
 if __name__ == "__main__":
     main()
