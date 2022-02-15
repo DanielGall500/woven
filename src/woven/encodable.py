@@ -129,6 +129,30 @@ class WOVEncodable:
                 wov_encoding[i][nth_best_indx] = 1 if binary else nth_best_val
         return wov_encoding
 
+    def get_encoding(self, confidence_scores, l=20, theta=10):
+        cs_shape = confidence_scores.shape
+        wov_encoding = np.zeros(cs_shape)
+
+        #Iterate row of English contributions
+        #to a single German output
+        for row_indx, row in enumerate(confidence_scores):
+            max_val = np.amax(row)
+
+            #If we can make at least one connection
+            #in this row then continue
+            if max_val >= l:
+                #Iterate I->O contributions
+                for col_indx, val in enumerate(row):
+                    #Check if value is irrelevant
+                    if val >= 0:
+                        #Calculate the lower bound for this row
+                        lower_bound = max_val-theta if (max_val-theta >= 0) else 0
+
+                        #Does this value meet the lower bound?
+                        wov_encoding[row_indx][col_indx] = 1 \
+                                if val >= lower_bound else 0
+        return wov_encoding
+
     def index_in_input_of(self, A: str):
         return self.t_inp.index(A)
 
