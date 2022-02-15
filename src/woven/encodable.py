@@ -129,7 +129,8 @@ class WOVEncodable:
                 wov_encoding[i][nth_best_indx] = 1 if binary else nth_best_val
         return wov_encoding
 
-    def get_encoding(self, confidence_scores, l=20, theta=10):
+    def get_encoding(self, l=20, theta=10):
+        confidence_scores = self.get_confidence_scores()
         cs_shape = confidence_scores.shape
         wov_encoding = np.zeros(cs_shape)
 
