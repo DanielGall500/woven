@@ -109,25 +109,7 @@ class WOVEncodable:
         #Round the scores
         confidence_scores = np.around(confidence_scores, 2)
         return confidence_scores
-                
-    def get_wov_encoding(self, binary=False, n=2):
-        cs = self.get_confidence_scores()
-        wov_encoding = np.zeros(cs.shape)
-
-        #Iterate through each row of values E 
-        #on a given g
-        for i, row in enumerate(cs):
-            sorted_row = np.sort(row)
-
-            #Find the number of highest scores n
-            for j in range(n):
-                nth_best_val = sorted_row[len(row)-1-j]
-                nth_best_indx = np.where(row == nth_best_val)[0][0]
-
-                #If we have selected binary, give a binary encoding.
-                #Otherwise, include the confidence score.
-                wov_encoding[i][nth_best_indx] = 1 if binary else nth_best_val
-        return wov_encoding
+        
 
     def get_encoding(self, l=20, theta=10):
         confidence_scores = self.get_confidence_scores()
