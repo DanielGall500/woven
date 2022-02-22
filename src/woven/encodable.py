@@ -1,16 +1,18 @@
 import numpy as np
 from numpy.linalg import norm
 from sklearn.preprocessing import normalize
+import re
 """
 WOVEncodable
 A matrix of normalised Shapley values for a particular
 translation from X to Y.
 """
 class WOVEncodable:
-    def __init__(self, t_inp, t_out, shap_values):
+    def __init__(self, org_input, t_inp, t_out, shap_values):
         #Check whether encodable shape is
         #correct
         if self._is_correct_shape(t_inp, t_out, shap_values):
+            self.org_inp = org_input
             self.t_inp = t_inp
             self.t_out = t_out
             self.raw = shap_values
@@ -108,11 +110,15 @@ class WOVEncodable:
 
         #Round the scores
         confidence_scores = np.around(confidence_scores, 2)
+
+        #Transpose back to original form
+        confidence_scores = np.transpose(confidence_scores)
         return confidence_scores
         
-
-    def get_encoding(self, l=20, theta=10):
+    def get_encoding(self, l=20, theta=10, merged=False):
         confidence_scores = self.get_confidence_scores()
+        #Transpose for simplicity. Reverted at the end
+        confidence_scores = np.transpose(confidence_scores)
         cs_shape = confidence_scores.shape
         wov_encoding = np.zeros(cs_shape)
 
@@ -134,7 +140,51 @@ class WOVEncodable:
                         #Does this value meet the lower bound?
                         wov_encoding[row_indx][col_indx] = 1 \
                                 if val >= lower_bound else 0
-        return wov_encoding
+        wov_encoding = np.transpose(wov_encoding)
+    
+        if merged:
+            return self._detokenise(wov_encoding)
+        else:
+            return wov_encoding
+
+    def _detokenise(self, enc, tokenised_input=None, \
+            tokenised_output=None, original_input=None):
+        tokenised_input = self.t_inp if tokenised_input is None \
+                else tokenised_input
+        tokenised_output = self.t_out if tokenised_output is None \
+                else tokenised_output
+        original_input = self.org_inp if original_input is None \
+                else original_input
+
+        punc = ['\s', '\,\s','\.\s','\?\s']
+        delims = '|'.join([p for p in punc])
+        words = re.split(delims, original_input)
+        vector_sum = np.zeros([len(tokenised_output)])
+
+        merged_matrix = []
+        next_word = True
+        curr = -1
+        for t, t_encoding in zip(tokenised_input, enc):
+            if next_word:
+                #Store merged vector in matrix
+                vector_sum = t_encoding
+
+                #Move onto the next word
+                curr += 1
+                word = words[curr]
+            else:
+                #Merge last vector and this vector
+                vector_sum += t_encoding
+
+            #Remove token from word and see what's next
+            word = word.replace(t, '')
+            next_word = (word == '')
+
+            if next_word:
+                merged_matrix.append(vector_sum)
+
+        return np.array(merged_matrix)
+        
 
     def index_in_input_of(self, A: str):
         return self.t_inp.index(A)
