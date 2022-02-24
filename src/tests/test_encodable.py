@@ -85,7 +85,8 @@ class TestEncodable(unittest.TestCase):
 
         ex2_correct_merge = np.array([
             [1,1,0,0],
-            [0,2,0,2],
+            [0,1,0,1],
             [0,0,1,0]])
+        enc.merged_inp = np.array(["I", "ate", "it"])
         merged_matrix = enc._detokenise(ex2_enc, ex2_tinp, ex2_tout, ex2_org_str) 
         self.assertTrue(np.array_equal(merged_matrix, ex2_correct_merge))
