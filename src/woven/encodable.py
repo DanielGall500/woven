@@ -16,7 +16,7 @@ class WOVEncodable:
             self.t_inp = t_inp
             self.t_out = t_out
             self.raw = shap_values
-
+            self.merged_inp = self._split_by_word(org_input)
         else:
             raise Exception("Arguments Of Invalid Shape")
 
@@ -156,11 +156,9 @@ class WOVEncodable:
         original_input = self.org_inp if original_input is None \
                 else original_input
 
-        punc = ['\s', '\,\s','\.\s','\?\s']
-        delims = '|'.join([p for p in punc])
-        words = re.split(delims, original_input)
         vector_sum = np.zeros([len(tokenised_output)])
 
+        words = self.merged_inp
         merged_matrix = []
         next_word = True
         curr = -1
@@ -183,8 +181,14 @@ class WOVEncodable:
             if next_word:
                 merged_matrix.append(vector_sum)
 
-        return np.array(merged_matrix)
+        merged_matrix = np.array(merged_matrix)
+        merged_matrix = np.where(merged_matrix > 0, 1, 0)
+        return merged_matrix 
         
+    def _split_by_word(self, I: str):
+        punc = ['\s', '\,\s','\.\s','\?\s']
+        delims = '|'.join([p for p in punc])
+        return re.split(delims, I)
 
     def index_in_input_of(self, A: str):
         return self.t_inp.index(A)
