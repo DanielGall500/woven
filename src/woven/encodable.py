@@ -169,15 +169,25 @@ class WOVEncodable:
 
                 #Move onto the next word
                 curr += 1
+
+                #If we have reached end of our
+                #merged words, ignore the rest
+                #of the original tokens
+                if curr >= len(words):
+                    break
                 word = words[curr]
             else:
                 #Merge last vector and this vector
                 vector_sum += t_encoding
 
             #Remove token from word and see what's next
+            #Remove _ from tokenised words
+            if len(t) > 0:
+                if t not in word:
+                    t = t[1:]
+
             word = word.replace(t, '')
             next_word = (word == '')
-
             if next_word:
                 merged_matrix.append(vector_sum)
 
