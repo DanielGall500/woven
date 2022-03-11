@@ -1,4 +1,14 @@
 {% extends "base.html" %}
 {% block title %}WOVEN{% endblock %}
 {%block content%}
-{%endblock%}
+<form method="post">
+  <div class="form-group">
+    <label for="inputText">Original</label>
+    <input type="text" class="form-control" id="inputText" aria-describedby="inputHelp" placeholder="Enter text for encoding here." name="inputText">
+    <small id="inputHelp" class="form-text text-muted">Ensure that your input is in the appropriate language.</small>
+  </div>
+  <button type="submit" class="btn btn-primary", value="submit">Submit</button>
+</form>
+<h1>{{translation}}</h1>
+{%endblock content%}
+
