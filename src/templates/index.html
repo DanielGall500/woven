@@ -9,6 +9,17 @@
   </div>
   <button type="submit" class="btn btn-primary", value="submit">Submit</button>
 </form>
+
+<h2>English</h2><br>
+{% for i in num_input_tokens %} 
+<span style="background-color: {{icolours[i]}}">{{itokens[i]}} &nbsp;</p>
+{% endfor %}<br>
+
+<h2>German</h2>
+{% for i in num_output_tokens %} 
+<span style="background-color: {{ocolours[i]}}">{{otokens[i]}} &nbsp;</p>
+{% endfor %}<br>
+
 <h1>{{translation}}</h1>
 {%endblock content%}
 
