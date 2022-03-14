@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request
 from woven.encoder import WOVEncoder
-from connections import make_colour_connections
+from connections import make_colour_connections, create_graph
+from pyvis.network import Network
 
 app = Flask(__name__)
 encoder = WOVEncoder()
@@ -18,6 +19,13 @@ def home():
         out_text = " ".join([x for x in encodable.t_out])
         itokens = encodable.merged_inp
         otokens = encodable.t_out
+        print("Encoding:")
+        print("Input: ", itokens)
+        print("Output: ", otokens)
+        print(encoding)
+        print("----")
+        grph = create_graph(itokens,otokens,encoding)
+        grph.show('nx.html')
         return render_template("index.html", translation=out_text, itokens=itokens, \
                 otokens=otokens, icolours=icolours,\
                 ocolours=ocolours, num_input_tokens=range(len(itokens)),\

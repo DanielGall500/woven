@@ -1,6 +1,9 @@
 from woven.encoder import WOVEncoder
 import numpy as np
 import random
+import networkx as nx
+import matplotlib.pyplot as plt
+from pyvis.network import Network
 
 """
 Pseudocode
@@ -39,3 +42,44 @@ def make_colour_connections(encoding):
             output_colours.append(appropriate_colour)
             #raise Exception(encoding)
     return colours, output_colours
+
+def create_graph(itokens, otokens, encoding):
+    G = nx.Graph() 
+
+    for i, itok in enumerate(itokens):
+        G.add_node(int(i), label=itok, pos=(i,2), is_input=True) 
+
+    total_nodes = G.number_of_nodes()
+    for i, otok in enumerate(otokens):
+        next_node_indx = int(i+total_nodes)
+        G.add_node(next_node_indx, label=otok, pos=(i,1), is_input=False)
+
+    for i, row in enumerate(encoding):
+        #Get the word for each input row
+        connections = np.where(row == 1)[0]
+        connections = [int(x) for x in connections]
+        print(connections)
+
+        for c in connections:
+            print("Making connections between {} and {}".format(i,c+total_nodes))
+            #Adds an edge from input to output
+            print(G.nodes)
+            G.add_edge(i,c+total_nodes)
+    print("Finished!")
+    print(nx.info(G))
+    nt = Network('500px', '500px')
+
+    print("Test 1")
+    for e in G.edges(data=True):
+        print(e[1])
+        print(type(e[1]))
+    print("----")
+    print(G.nodes[0])
+    print(G.nodes)
+    print(type(G.nodes[0]))
+    nt.from_nx(G)
+
+    #nx.draw(G, pos=node_positions, labels=node_tokens, \
+     #       with_labels=True, font_weight='bold', node_size=3000)
+    #plt.show()
+    return nt
