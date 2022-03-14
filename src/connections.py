@@ -43,43 +43,39 @@ def make_colour_connections(encoding):
             #raise Exception(encoding)
     return colours, output_colours
 
-def create_graph(itokens, otokens, encoding):
+def create_graph(itokens, otokens, icolours, ocolours, encoding):
     G = nx.Graph() 
+    total_tokens = len(itokens) + len(otokens)
 
+    curr_x = 0
+    x = [x for x in range(0,10000,10000%total_tokens)]
     for i, itok in enumerate(itokens):
-        G.add_node(int(i), label=itok, pos=(i,2), is_input=True) 
+        G.add_node(int(i), label=itok, physics=False,x=x[i], y=200, color=icolours[i]) 
 
     total_nodes = G.number_of_nodes()
     for i, otok in enumerate(otokens):
         next_node_indx = int(i+total_nodes)
-        G.add_node(next_node_indx, label=otok, pos=(i,1), is_input=False)
+        G.add_node(next_node_indx, label=otok, physics=False, x=x[i], y=100, color=ocolours[i])
+
+    default_edges_input = [(i,i+1) for i in range(len(itokens)-1)]
+    default_edges_output = [(i+total_nodes,i+total_nodes+1) for i in range(len(otokens)-1)]
+    G.add_edges_from(default_edges_input,color=icolours)
+    G.add_edges_from(default_edges_output,color=ocolours)
+
+    for i,(a,b) in enumerate(default_edges_input):
+        G.add_edge(a,b,color='black')
+
+    for i,(a,b) in enumerate(default_edges_output):
+        G.add_edge(a,b,color='black')
 
     for i, row in enumerate(encoding):
         #Get the word for each input row
         connections = np.where(row == 1)[0]
         connections = [int(x) for x in connections]
-        print(connections)
 
         for c in connections:
-            print("Making connections between {} and {}".format(i,c+total_nodes))
             #Adds an edge from input to output
-            print(G.nodes)
-            G.add_edge(i,c+total_nodes)
-    print("Finished!")
-    print(nx.info(G))
+            G.add_edge(i,c+total_nodes,color='red')
     nt = Network('500px', '500px')
-
-    print("Test 1")
-    for e in G.edges(data=True):
-        print(e[1])
-        print(type(e[1]))
-    print("----")
-    print(G.nodes[0])
-    print(G.nodes)
-    print(type(G.nodes[0]))
     nt.from_nx(G)
-
-    #nx.draw(G, pos=node_positions, labels=node_tokens, \
-     #       with_labels=True, font_weight='bold', node_size=3000)
-    #plt.show()
     return nt
