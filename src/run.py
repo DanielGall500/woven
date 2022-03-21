@@ -9,7 +9,8 @@ encoder = WOVEncoder()
 @app.route("/", methods=["POST", "GET"])
 def home():
     if request.method == "GET":
-        return render_template("index.html", translation="None") 
+        return render_template("index.html", translation="None",\
+                is_active=False) 
     else:
         print(request.form.keys())
         text_input = request.form["inputText"]
@@ -24,7 +25,10 @@ def home():
         return render_template("index.html", translation=out_text, itokens=itokens, \
                 otokens=otokens, icolours=icolours,\
                 ocolours=ocolours, num_input_tokens=range(len(itokens)),\
-                num_output_tokens=range(len(otokens)))
+                num_output_tokens=range(len(otokens)),\
+                input_language="English",
+                output_language="German",
+                is_active=True)
 
 @app.route("/vis", methods=["POST", "GET"])
 def vis():
