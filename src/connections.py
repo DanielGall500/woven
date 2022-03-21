@@ -48,7 +48,7 @@ def create_graph(itokens, otokens, icolours, ocolours, encoding):
     total_tokens = len(itokens) + len(otokens)
 
     curr_x = 0
-    x = [x for x in range(0,10000,10000%total_tokens)]
+    x = [x for x in range(0,2000,int(2000/total_tokens))]
     for i, itok in enumerate(itokens):
         G.add_node(int(i), label=itok, physics=False,x=x[i], y=200, color=icolours[i]) 
 
@@ -76,6 +76,6 @@ def create_graph(itokens, otokens, icolours, ocolours, encoding):
         for c in connections:
             #Adds an edge from input to output
             G.add_edge(i,c+total_nodes,color='red')
-    nt = Network('500px', '500px')
+    nt = Network('800px', '1000px')
     nt.from_nx(G)
     return nt
