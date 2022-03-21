@@ -7,24 +7,36 @@
     <input type="text" class="form-control" id="inputText" aria-describedby="inputHelp" placeholder="Enter text for encoding here." name="inputText">
     <small id="inputHelp" class="form-text text-muted">Ensure that your input is in the appropriate language.</small>
   </div>
-  <button type="submit" class="btn btn-primary", value="submit">Submit</button>
-</form>
+
+  <div class="row align-items-start">
+	<div class="col-sm">
+	<button type="submit" class="btn btn-primary", value="submit">Submit</button>
+	</div></form>
+	<div class="col-sm">
+	{% if is_active == True %}
+	<form method='post' action='/vis'><button type='submit' class="btn btn-primary">Visualise Me!</button></form>
+	{% else %}
+	<form method='post' action='/vis'><button type='submit' class="btn btn-primary" disabled>Visualise Me!</button></form>
+	{% endif %}
+	</div>
+	<div class="col-sm">
+		<form method='get' action='/'><button type='submit' class="btn btn-primary">Delete</button></form>
+  </div>
+
 
 <div class="container">
-	<h2>English</h2><br>
+	<h2>{{input_language}}</h2><br>
 	{% for i in num_input_tokens %} 
 		<span style="background-color: {{icolours[i]}}">{{itokens[i]}}</span>
 	{% endfor %}<br>
 </div>
 
 <div class="container">
-	<h2>German</h2>
+	<h2>{{output_language}}</h2>
 	{% for i in num_output_tokens %} 
 		<span style="background-color: {{ocolours[i]}};">{{otokens[i]}}</span>
 	{% endfor %}<br>
 </div>
-
-<form method='post' action='/vis'><button type='submit' class="btn btn-primary">Visualise Me!</button></form>
 
 {%endblock content%}
 
