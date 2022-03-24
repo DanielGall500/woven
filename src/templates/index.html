@@ -28,6 +28,7 @@
 
 {% if is_active == True %}
 <div class="container">
+<div class="col-md-5"></div>
 <div class="col-md-5">
 	<h2 class="inline">WOV Encoding</h2>
 	<table class="table inline">
@@ -45,12 +46,14 @@
 		</tbody>
 	</table>
 </div>
+<div class="col-md-5"></div>
 	<div class="col-md-5 inline">
 	<h2>{{input_language}}</h2><br>
 	{% for i in num_input_tokens %} 
 		<span style="background-color: {{icolours[i]}}">{{itokens[i]}}</span>
 	{% endfor %}<br></div>
 
+<div class="col-md-5"></div>
 <div class="col-md-5 inline">
 	<h2>{{output_language}}</h2>
 	{% for i in num_output_tokens %} 
